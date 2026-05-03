@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, FormGroup, Label, Input, Button, Table, Container } from "reactstrap";
 import { useBooking } from "../context/BookingContext";
 
+
 function BookingForm({ 
   availableTimes,
   dispatch, 
@@ -12,10 +13,16 @@ function BookingForm({
   const { booking, updateBooking } = useBooking();
   const [name, setName] = useState(booking.name || "Joe Smith");
   const [email, setEmail] = useState(booking.email || "something@example.com");
-  const [phone, setPhone] = useState(booking.phone || "555-555-5555");
+  const [phone, setPhone] = useState(booking.phone || "123-456-7890");
   const [guests, setGuests] = useState(booking.guests || "4");
   const [date, setDate] = useState(booking.date || "");
   const [time, setTime] = useState(booking.time || "");
+
+  // for the date field to set earliest and latest date for Reservation 
+  const today = new Date().toISOString().split('T')[0];
+  const maxDateObj = new Date();
+  maxDateObj.setMonth(maxDateObj.getMonth() + 2);
+  const maxDate = maxDateObj.toISOString().split('T')[0];
 
 
 
@@ -86,24 +93,28 @@ function BookingForm({
           onSubmit={handleSubmit2}
         >
           <FormGroup>
-            <Label htmlFor="name" id="label-name">Name</Label>
+            <Label htmlFor="name" id="label-name">Full Name:</Label>
             <Input 
              id="res-name" 
               name="name" 
               type="text" 
               placeholder="Name" 
-              required
               aria-required="true"
-              aria-labelledby="label-name" 
+              aria-labelledby="label-name"
+              required 
+              minLength="2" 
+              maxLength="30" 
+              pattern="[a-zA-Z\s]+" 
+              title="Name should only contain letters and spaces"               
               value={name}
               onChange={(e) => setName(e.target.value)}                     
             />            
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="email" id="label-email">Email</Label>
+            <Label htmlFor="email" id="label-email">Email address:</Label>
             <Input 
               name="email" 
-              type="text" 
+              type="email" 
               placeholder="Email" 
               required
               aria-required="true"
@@ -113,24 +124,29 @@ function BookingForm({
             />             
            </FormGroup>
            <FormGroup>
-            <Label htmlFor="phone" id="label-phone">Phone</Label>
+            <Label htmlFor="phone" id="label-phone">Phone number (Format: 123-456-7890):</Label>
             <Input 
               name="phone" 
-              type="text" 
-              placeholder="Phone" 
+              type="tel" 
               required
               aria-required="true" 
-              aria-labelledby="label-phone" 
+              aria-labelledby="label-phone"
+              pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+              placeholder="123-456-7890"
+              title="Phone number must be in the format 123-456-7890"               
               value={phone}
               onChange={(e) => setPhone(e.target.value)}                     
             />             
            </FormGroup> 
            <FormGroup>
-            <Label htmlFor="guests" id="label-guests">Guests</Label>
+            <Label htmlFor="guests" id="label-guests">Guests (2-8):</Label>
             <Input 
               name="guests" 
-              type="text" 
-              placeholder="Guests" 
+              type="number" 
+              id="guests" 
+              min="2" 
+              max="8"               
+              placeholder="2" 
               required
               aria-required="true"
               aria-labelledby="label-guests"  
@@ -139,12 +155,14 @@ function BookingForm({
             />             
            </FormGroup> 
            <FormGroup>
-            <Label htmlFor="date" id="label-date">Date</Label>
+            <Label htmlFor="date" id="label-date">Booking Date (Max 2-month advance):</Label>
             <Input 
               id="date"
               name="date" 
               type="date" 
               placeholder="Guests" 
+              min={today}
+              max={maxDate} 
               value={date}
               onChange={handleDateChange}
               required
@@ -160,7 +178,7 @@ function BookingForm({
                     <input 
                       type="radio" 
                       id={timeOption} 
-                      name="time" 
+                      name="time"                        
                       value={timeOption} 
                       onChange={handleTimeChange} 
                       aria-labelledby={timeOption}
@@ -180,5 +198,4 @@ function BookingForm({
 }
 
 export default BookingForm;
-
 

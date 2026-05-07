@@ -15,8 +15,8 @@ function BookingForm({
   const [email, setEmail] = useState(booking.email || "something@example.com");
   const [phone, setPhone] = useState(booking.phone || "123-456-7890");
   const [guests, setGuests] = useState(booking.guests || "4");
-  const [date, setDate] = useState(booking.date || "");
-  const [time, setTime] = useState(booking.time || "");
+  const [date, setDate] = useState(booking.date || "2026-05-07");
+  const [time, setTime] = useState(booking.time || "17:00");
 
   // for the date field to set earliest and latest date for Reservation 
   const today = new Date().toISOString().split('T')[0];
@@ -101,7 +101,6 @@ function BookingForm({
               placeholder="Name" 
               aria-required="true"
               aria-labelledby="label-name"
-              required 
               minLength="2" 
               maxLength="30" 
               pattern="[a-zA-Z\s]+" 
@@ -116,7 +115,6 @@ function BookingForm({
               name="email" 
               type="email" 
               placeholder="Email" 
-              required
               aria-required="true"
               aria-labelledby="label-email"  
               value={email}
@@ -128,7 +126,6 @@ function BookingForm({
             <Input 
               name="phone" 
               type="tel" 
-              required
               aria-required="true" 
               aria-labelledby="label-phone"
               pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
@@ -147,7 +144,6 @@ function BookingForm({
               min="2" 
               max="8"               
               placeholder="2" 
-              required
               aria-required="true"
               aria-labelledby="label-guests"  
               value={guests}
@@ -161,34 +157,33 @@ function BookingForm({
               name="date" 
               type="date" 
               placeholder="Guests" 
-              min={today}
-              max={maxDate} 
               value={date}
               onChange={handleDateChange}
-              required
               aria-required="true"
               aria-labelledby="label-date"                                   
             />             
            </FormGroup>
-            <FormGroup tag="fieldset">
-              <legend>Time</legend> 
-              <div className="box" role="radiogroup" aria-label="select-time">
-                {availableTimes.map((timeOption) => (
-                  <div key={timeOption} className="timeOptions">
-                    <input 
-                      type="radio" 
-                      id={timeOption} 
-                      name="time"                        
-                      value={timeOption} 
-                      onChange={handleTimeChange} 
-                      aria-labelledby={timeOption}
-                      required 
-                    />
-                    <label id={timeOption} htmlFor={timeOption}>{timeOption}</label>
-                  </div>
-                ))}
-              </div>
-            </FormGroup>
+
+
+
+              <FormGroup>
+                <Label htmlFor="time" id="label-time">
+                  Time:
+                </Label>
+                <select
+                  name="time"
+                  id="time"
+                  onChange={handleTimeChange}
+                  aria-required="true"
+                  aria-labelledby="label-time"
+                >
+                  {availableTimes.map((timeOption) => (
+                    <option key={timeOption} value={timeOption}>
+                      {timeOption}
+                    </option>
+                  ))}
+                </select>
+              </FormGroup>
           <Button role="button" type="submit">Add Another</Button>                                              
           <Button role="button" type="submit">submit</Button>
         </Form>

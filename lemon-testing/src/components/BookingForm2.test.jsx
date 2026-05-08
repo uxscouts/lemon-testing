@@ -1,4 +1,153 @@
 
+
+/*
+import React from "react";
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import BookingForm from './BookingForm2';
+
+describe('BookingForm Component', () => {
+  it('renders all form fields correctly', () => {
+    render(<BookingForm />);
+    
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/email address/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/phone/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/guests/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /submit/i })).toBeDisabled();
+  });
+
+  it('shows validation errors for invalid input', async () => {
+    render(<BookingForm />);
+    const nameInput = screen.getByLabelText(/full name/i);
+    
+    // Trigger validation by touching and leaving the field
+    await userEvent.type(nameInput, '123');
+    fireEvent.blur(nameInput);
+
+    expect(await screen.findByText(/name should only contain letters and spaces/i)).toBeInTheDocument();
+  });
+
+  it('validates guest range (2-8)', async () => {
+    render(<BookingForm />);
+    const guestsInput = screen.getByLabelText(/guests/i);
+    
+    await userEvent.clear(guestsInput);
+    await userEvent.type(guestsInput, '10');
+    fireEvent.blur(guestsInput);
+
+    expect(await screen.findByText(/maximum 8 guests/i)).toBeInTheDocument();
+  });
+
+  it('enables the submit button when the form is valid', async () => {
+    render(<BookingForm />);
+    
+    await userEvent.type(screen.getByLabelText(/full name/i), 'John Doe');
+    await userEvent.type(screen.getByLabelText(/email address/i), 'john@example.com');
+    await userEvent.type(screen.getByLabelText(/phone/i), '123-456-7890');
+    // Guests defaults to 2, which is valid
+    
+    const submitBtn = screen.getByRole('button', { name: /submit/i });
+    await waitFor(() => expect(submitBtn).toBeEnabled());
+  });
+
+  it('submits form data and shows alert', async () => {
+    const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    render(<BookingForm />);
+
+    await userEvent.type(screen.getByLabelText(/full name/i), 'Jane Doe');
+    await userEvent.type(screen.getByLabelText(/email address/i), 'jane@test.com');
+    await userEvent.type(screen.getByLabelText(/phone/i), '987-654-3210');
+    
+    const submitBtn = screen.getByRole('button', { name: /submit/i });
+    await userEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(alertMock).toHaveBeenCalledWith(expect.stringContaining('Jane Doe'));
+    });
+    
+    alertMock.mockRestore();
+  });
+});
+
+*/
+
+
+/// this one takes bad data
+
+import React from "react";
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import BookingForm from './BookingForm2';
+
+describe('BookingForm Validation', () => {
+  
+  it('renders all form fields correctly', () => {
+    render(<BookingForm />);
+    expect(screen.getByLabelText(/Full Name:/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Email address:/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Phone/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Guests/i)).toBeInTheDocument();
+  });
+
+  it('shows error messages for invalid "bad data" inputs', async () => {
+    render(<BookingForm />);
+
+    // 1. Enter bad name (numbers)
+    fireEvent.change(screen.getByLabelText(/Full Name:/i), { target: { value: 'John123' } });
+    fireEvent.blur(screen.getByLabelText(/Full Name:/i));
+
+    // 2. Enter bad email
+    fireEvent.change(screen.getByLabelText(/Email address:/i), { target: { value: 'not-an-email' } });
+    fireEvent.blur(screen.getByLabelText(/Email address:/i));
+
+    // 3. Enter bad phone format
+    fireEvent.change(screen.getByLabelText(/Phone/i), { target: { value: '1234567890' } });
+    fireEvent.blur(screen.getByLabelText(/Phone/i));
+
+    // 4. Enter guest count out of range
+    fireEvent.change(screen.getByLabelText(/Guests/i), { target: { value: '10' } });
+    fireEvent.blur(screen.getByLabelText(/Guests/i));
+
+    // Validation is async in Formik/Yup
+    await waitFor(() => {
+      expect(screen.getByText(/Name should only contain letters and spaces/i)).toBeInTheDocument();
+      expect(screen.getByText(/Invalid email address/i)).toBeInTheDocument();
+      expect(screen.getByText(/Format must be 123-456-7890/i)).toBeInTheDocument();
+      expect(screen.getByText(/Maximum 8 guests/i)).toBeInTheDocument();
+    });
+
+    // Ensure submit button is disabled
+    const submitBtn = screen.getByRole('button', { name: /submit/i });
+    expect(submitBtn).toBeDisabled();
+  });
+
+  it('enables the submit button with valid data', async () => {
+    render(<BookingForm />);
+
+    fireEvent.change(screen.getByLabelText(/Full Name:/i), { target: { value: 'Jane Doe' } });
+    fireEvent.change(screen.getByLabelText(/Email address:/i), { target: { value: 'jane@xample.com' } });
+    fireEvent.change(screen.getByLabelText(/Phone/i), { target: { value: '123-456-7890' } });
+    fireEvent.change(screen.getByLabelText(/Guests/i), { target: { value: '4' } });
+
+    await waitFor(() => {
+      const submitBtn = screen.getByRole('button', { name: /submit/i });
+      expect(submitBtn).not.toBeDisabled();
+    });
+  });
+
+});
+
+
+
+
+
+
+
+
+/*
+
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
@@ -115,6 +264,6 @@ describe("SignupForm Validation", () => {
   });
 });
 
-
+*/
 
 

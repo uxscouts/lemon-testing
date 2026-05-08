@@ -1,111 +1,114 @@
-import React, { useState } from "react";
-import { Form, FormGroup, Label, Input, Button, Table, Container } from "reactstrap";
-import { useBooking } from "../context/BookingContext";
+
+import React from 'react';
+import { useFormik } from 'formik';
+import { Form as BootstrapForm, FormGroup, Label, Input, Button, FormFeedback } from 'reactstrap';
+import * as Yup from 'yup';
+
+const bookingSchema = Yup.object().shape({
+  name: Yup.string()
+    .matches(/^[a-zA-Z\s]+$/, "Name should only contain letters and spaces")
+    .required("Full name is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  phone: Yup.string()
+    .matches(/^\d{3}-\d{3}-\d{4}$/, "Format must be 123-456-7890")
+    .required("Phone number is required"),
+  guests: Yup.number()
+    .min(2, "Minimum 2 guests")
+    .max(8, "Maximum 8 guests")
+    .required("Number of guests is required"),
+});
 
 
-function BookingForm2({  
-  onChildSubmit
-}) {
-
-  const { booking, updateBooking } = useBooking();
-  const [name, setName] = useState(booking.name || "");
-  const [email, setEmail] = useState(booking.email || "");
-  const [phone, setPhone] = useState(booking.phone || "123-456-7890");
-  const [guests, setGuests] = useState(booking.guests || "4");
-  
-
-  const handleSubmit2 = (event) => {
-    event.preventDefault(); // Stop reload
-    const data = new FormData(event.target);
-    const value = Object.fromEntries(data.entries()); // Convert to object
-    updateBooking(value.name, value.email, value.phone, value.guests);
-    onChildSubmit(value); // Send up to parent
-  };
+const BookingForm = () => {
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      phone: '',
+      guests: 2,
+    },
+    validationSchema: bookingSchema,
+    onSubmit: (values) => {
+      console.log('Form Data:', values);
+      // Your handleSubmit2 logic goes here
+      const stringifiedData = JSON.stringify(values);
+      alert(stringifiedData);
+    },
+  });
 
 
   return (
-    <>
-    <h1 id="booking-title">Reservation Form</h1>
-      <div className="BookingFormContainer">
-        <Form
-          className="BookingForm"
-          aria-labelledby="booking-title"
-          onSubmit={handleSubmit2}
-        >
-          <FormGroup>
-            <Label htmlFor="name" id="label-name">Full Name:</Label>
-            <Input 
-             id="res-name" 
-              name="name" 
-              type="text" 
-              placeholder="Name" 
-              aria-required="true"
-              aria-labelledby="label-name"
-              required
-              /*
-              minLength="2" 
-              maxLength="30" 
-              pattern="[a-zA-Z\s]+"
-              */ 
-              title="Name should only contain letters and spaces"               
-              value={name}
-              onChange={(e) => setName(e.target.value)}                     
-            />            
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="email" id="label-email">Email address:</Label>
-            <Input 
-              name="email" 
-              type="email" 
-              placeholder="Email" 
-              aria-required="true"
-              aria-labelledby="label-email" 
-              required 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}                     
-            />             
-           </FormGroup>
-           <FormGroup>
-            <Label htmlFor="phone" id="label-phone">Phone number (Format: 123-456-7890):</Label>
-            <Input 
-              name="phone" 
-              type="tel" 
-              aria-required="true" 
-              aria-labelledby="label-phone"
-              required
-              /*
-              pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-              placeholder="123-456-7890"
-              */
-              title="Phone number must be in the format 123-456-7890"               
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}                     
-            />             
-           </FormGroup> 
-           <FormGroup>
-            <Label htmlFor="guests" id="label-guests">Guests (2-8):</Label>
-            <Input 
-              name="guests" 
-              type="number" 
-              id="guests"
-              /* 
-              min="2" 
-              max="8"
-              */               
-              placeholder="2" 
-              aria-required="true"
-              aria-labelledby="label-guests"
-              required  
-              value={guests}
-              onChange={(e) => setGuests(e.target.value)}                     
-            />             
-           </FormGroup> 
-          <Button role="button" type="submit">submit</Button>
-        </Form>
-        </div>
-    </>
-  );
-}
+    <BootstrapForm className="BookingForm" onSubmit={formik.handleSubmit}>
+      <FormGroup>
+        <Label htmlFor="name">Full Name:</Label>
+        <Input
+          id="name"
+          name="name"
+          type="text"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.name}
+          invalid={formik.touched.name && !!formik.errors.name}
+        />
+        <FormFeedback>{formik.errors.name}</FormFeedback>
+      </FormGroup>
 
-export default BookingForm2;
+      <FormGroup>
+        <Label htmlFor="email">Email address:</Label>
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="Email"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.email}
+          invalid={formik.touched.email && !!formik.errors.email}
+        />
+        <FormFeedback>{formik.errors.email}</FormFeedback>
+      </FormGroup>
+
+      <FormGroup>
+        <Label htmlFor="phone">Phone (123-456-7890):</Label>
+        <Input
+          id="phone"
+          name="phone"
+          type="tel"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.phone}
+          invalid={formik.touched.phone && !!formik.errors.phone}
+        />
+        <FormFeedback>{formik.errors.phone}</FormFeedback>
+      </FormGroup>
+
+      <FormGroup>
+        <Label htmlFor="guests">Guests (2-8):</Label>
+        <Input
+          id="guests"
+          name="guests"
+          type="number"
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.guests}
+          invalid={formik.touched.guests && !!formik.errors.guests}
+        />
+        <FormFeedback>{formik.errors.guests}</FormFeedback>
+      </FormGroup>
+
+    <Button 
+        type="submit" 
+        color="primary" 
+        disabled={!(formik.isValid && formik.dirty)}
+      >Submit
+      </Button>
+
+
+    </BootstrapForm>
+  );
+};
+
+export default BookingForm;
 

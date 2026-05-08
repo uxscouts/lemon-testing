@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Reservation from "./pages/Reservation";
 import ConfirmedBooking from "./pages/ConfirmedBooking";
+import Testing from "./pages/Testing";
 
 
 const AppRoutes = () => {
@@ -28,6 +29,7 @@ const RouterConfig = () => {
                 <Route path="about" element={<About />} />
                 <Route path="reservation" element={<Reservation />} />
                 <Route path="confirmedbooking" element={<ConfirmedBooking />} />
+                <Route path="testing" element={<Testing />} />
             </Route>
         </Routes>
     )
